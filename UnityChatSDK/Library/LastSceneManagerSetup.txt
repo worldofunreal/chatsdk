@@ -1,5 +1,5 @@
 sceneSetups:
-- path: Assets/ChatSDK/demo_backup.unity
+- path: Assets/ChatSDK/Demo_Scene.unity
   isLoaded: 1
   isActive: 1
   isSubScene: 0

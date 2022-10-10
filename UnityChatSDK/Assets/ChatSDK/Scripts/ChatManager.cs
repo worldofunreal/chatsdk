@@ -47,7 +47,7 @@ public class ChatManager : MonoBehaviour
         else
         {
             //if the chatBox is !not focused, it can 
-            if(!chatBox.isFocused && Input.anyKeyDown)
+            if(!chatBox.isFocused && Input.GetKeyDown(KeyCode.Return))
                 chatBox.ActivateInputField();
                 //still needs code to deactivate with another enter
         }
