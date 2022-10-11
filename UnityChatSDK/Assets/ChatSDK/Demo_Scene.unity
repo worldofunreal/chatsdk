@@ -3370,10 +3370,18 @@ MonoBehaviour:
   username: BiZKiT
   maxMessages: 24
   chatPanel: {fileID: 2092063880}
+  chatCanvas: {fileID: 1846567072}
   textObject: {fileID: 8526854038668516708, guid: 8e36e80b91419b149a467eb6170d8724, type: 3}
+  canvasLoginButton: {fileID: 909029573}
+  loginPanel: {fileID: 1536999012}
+  newNamePanel: {fileID: 1140809129}
+  loadingPanel: {fileID: 1490606310}
   chatBox: {fileID: 993999794}
+  newUserInput: {fileID: 1080654449}
   playerMessage: {r: 1, g: 1, b: 1, a: 1}
   info: {r: 0.9687288, g: 1, b: 0, a: 1}
+  loginButton: {fileID: 1821715753}
+  newUserButton: {fileID: 295508935}
   messageList: []
 --- !u!114 &2041781130
 MonoBehaviour:

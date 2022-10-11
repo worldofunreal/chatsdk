@@ -1,0 +1,12 @@
+{
+    "canisters": {
+        "core": {
+          "main": "src/chat/main.mo",
+          "type": "motoko"
+        },
+        "public_group": {
+            "main": "src/groups/main.mo",
+            "type": "motoko"
+        }
+    }
+}
