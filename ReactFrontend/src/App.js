@@ -14,54 +14,55 @@ const unityContext = new UnityContext({
 });
 
 function App() {
-  const [identity, setIdentity] = useState(null);
-  const [chatCoreCanister, setChatCoreCanister] = useState(null);
-  const [user, setUser] = useState(null);
-  const [username, setUsername] = useState("");
-  const [userGroups, setUserGroups] = useState(null);
-  const [groupsRender, setGroupsRender] = useState(null);
-  const [chatSelected, setChatSelected] = useState(null);
-  const [chatCanister, setChatCanister] = useState(null);
-  const [chatText, setChatText] = useState(null);
+  /// To integrate the chat you'll need the following:
+  const [identity,         setIdentity]         = useState(null); /// An identity of the user logged in
+  const [chatCoreCanister, setChatCoreCanister] = useState(null); /// The canister of the chat
+  const [userGroups,       setUserGroups]       = useState(null); /// The user's groups list
+  const [chatSelected,     setChatSelected]     = useState(null); /// The chat selected
+  const [chatCanister,     setChatCanister]     = useState(null); /// The canister of the selected chat
+  const [chatText,         setChatText]         = useState(null); /// The text in the selected chat
 
+  /// The IC's host URL
   const host = 'https://raw.ic0.app/';
+  /// The Chat canisterId
   const coreCanisterId = "2nfjo-7iaaa-aaaag-qawaq-cai";
   
   useEffect(() => {
     if(identity !== null) {
+      /// When an identity is set, get the Chat canister
       setCoreCanister();
     }
   }, [identity]);
 
   useEffect(() => {
     if(chatCoreCanister !== null){
+      /// When the canister is set, get the user's data
       loginUser();
     }
   }, [chatCoreCanister]);
 
-  useEffect(() => { }, [user]);
-
   useEffect(() => {
     if(userGroups !== null){
-      console.log("User groups", userGroups);
+      // When the user is set, show the list of groups they belong to
       renderGroupsList();
     }
   }, [userGroups]);
 
   useEffect(() => {
     if(chatSelected !== null){
+      /// When the user selects a group, get it's data
       getChatData();
     }
   }, [chatSelected]);
 
   useEffect(() => {
     if(chatText !== null){
-      console.log("Chat text", chatText);
+      /// Send the messages to Unity
       renderChatMessages();
     }
   }, [chatText]);
 
-
+  /// Connections to Unity
   unityContext.on("Login", () => {
     loginStoic();
   });
@@ -71,7 +72,6 @@ function App() {
   });
 
   unityContext.on("SendMessage", (text) => {
-    console.log("Send message from Unity", text);
     sendMessage(text);
   });
 
@@ -87,7 +87,6 @@ function App() {
       return identity;
     });
     setIdentity(_stoicIdentity);
-    return _stoicIdentity;
   };
 
   const setCanister = async (idl, canisterId) => {
@@ -106,21 +105,19 @@ function App() {
   };
 
   const loginUser = async () => {
+    /// Get user if exists
     let _user = await chatCoreCanister.get_user(identity.getPrincipal());
     if(_user === null || _user === [] || _user.length <= 0){
-      /// Create new user
+      /// Create new user, send request to ask for user's name from Unity
       unityContext.send("ChatManager", "SetNewUser", "");
     } else {
-      /// Already created
-      setUser(_user[0]);
-      setUsername(_user[0].username);
+      /// Already created, set the data and get the user's groups
       let _userGroups = await chatCoreCanister.get_user_groups();
       setUserGroups(_userGroups[0].groups);
       let _publicChat = _userGroups[0].groups[0]
       setChatSelected(_publicChat);
       unityContext.send("ChatManager", "Initialize", "");
     }
-    console.log("User:", _user);
   };
 
   const createNewUser = async (name) => {
@@ -133,7 +130,7 @@ function App() {
   };
 
   const renderGroupsList = () => {
-    setGroupsRender(
+    /*setGroupsRender(
       <>
       {
         userGroups.map((g) => {
@@ -143,7 +140,7 @@ function App() {
         })
       }
       </>
-    )
+    )*/
   };
 
   const getChatData = async () => {
