@@ -24,6 +24,7 @@ type ChatCore =
  service {
    add_user_to_group: (GroupID__1, UserID) -> (bool, text);
    ban_user: (UserID) -> (bool);
+   create_group: (text, bool, bool) -> (bool, text);
    create_user_profile: (Username__1) -> (bool);
    get_user: (UserID) -> (opt UserData) query;
    get_user_groups: () -> (opt UserGroups) query;

@@ -1,4 +1,6 @@
 import Array "mo:base/Array";
+import Cycles "mo:base/ExperimentalCycles";
+import Error "mo:base/Error";
 import Hash "mo:base/Hash";
 import HashMap "mo:base/HashMap";
 import Iter "mo:base/Iter";
@@ -42,7 +44,19 @@ actor class ChatCore (_owner : Principal) {
     private stable var inited : Bool = false;
     private stable var owner_ : Principal = _owner;
     private stable var groupsCounter : Nat = 0;
-
+    
+    //State functions
+    system func preupgrade() {
+        _groups     := Iter.toArray(groups.entries());
+        _users      := Iter.toArray(users.entries());
+        _userGroups := Iter.toArray(userGroups.entries());
+    };
+    system func postupgrade() {
+        _groups     := [];
+        _users      := [];
+        _userGroups := [];
+    };
+    
     public query func get_user(user : UserID) : async ?UserData{
         return users.get(user);
     };
@@ -139,38 +153,48 @@ actor class ChatCore (_owner : Principal) {
         return true;
     };
 
+    public shared(msg) func create_group(_groupname: Text, _isPrivate: Bool, _isDirect : Bool) : async (Bool, Text){
+        /// assert user is not banned
+        /// assert user has paid for the group
+        //Cycles.add(1_000_000_000_000);
+        Cycles.add(300_000_000_000);
+        let b = await GroupCanister.ChatGroups(msg.caller);
+        let _p : ?Principal = ?(Principal.fromActor(b));
+        var added : Bool = false;
+        switch (_p) {
+            case null {
+                throw Error.reject("Error creating new group canister");
+            };
+            case (?groupCanister) {
+                let _new_canister_principal : Text = Principal.toText(groupCanister);
+                let _grp_can : GroupCanister.ChatGroups = actor(_new_canister_principal);
+                let _userData : ?UserData = users.get(msg.caller);
+                switch(_userData){
+                    case(null){
+                        return (false, "Not added, user may not exist");
+                    };
+                    case(?_ud){
+                        added := await _grp_can.join_chat(msg.caller, _ud);
+                    };
+                };
+                let _new_group : GroupData = {
+                    groupID   = groupsCounter;
+                    owner     = msg.caller;
+                    canister  = _new_canister_principal;
+                    name      = _groupname;
+                    isPrivate = _isPrivate;
+                    isDirect  = _isDirect;
+                };
+                groups.put(groupsCounter, _new_group);
+                let _public_group_add : (Bool, Text) = await add_user_to_group(groupsCounter, msg.caller);
+                groupsCounter += 1;
+                return _public_group_add;
+            };
+        };
+        return (true, "OK");
+    };
+
     /*public shared(msg) func set_username(username : Username) : async (Bool, Text){
         assert(msg.caller)
     };*/
 };
-
-
-
-
-/*
-
-Normal users:
-* Can chat in public group
-* Can be added to private groups
-* Can chat in private groups added
-
-Premium users:
-* All from normal users
-* Can create groups as long as its within their quota plan
-
-Premium plans:
-*  5 Private group chats +   5 Private friend chats + in-game direct chat
-* 10 Private group chats +  25 Private friend chats + in-game direct chat
-* 50 Private chats chats + 100 Private friend chats + in-game direct chat
-
-Costs and prices: 
-(
- (# of available private chats * costs of a month worth of tokens for cycles ) 
- + 
- (cost of creating a canister in cycles * # of available chats) 
-) * 1.03
-
-
-Additional individual chats = (costs of a month worth of tokens for cycles + cost of creating a canister in cycles) * 1.10
-
-*/

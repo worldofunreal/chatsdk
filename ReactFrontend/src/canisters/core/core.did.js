@@ -26,6 +26,11 @@ export const idlFactory = ({ IDL }) => {
         [],
       ),
     'ban_user' : IDL.Func([UserID], [IDL.Bool], []),
+    'create_group' : IDL.Func(
+        [IDL.Text, IDL.Bool, IDL.Bool],
+        [IDL.Bool, IDL.Text],
+        [],
+      ),
     'create_user_profile' : IDL.Func([Username__1], [IDL.Bool], []),
     'get_user' : IDL.Func([UserID], [IDL.Opt(UserData)], ['query']),
     'get_user_groups' : IDL.Func([], [IDL.Opt(UserGroups)], ['query']),

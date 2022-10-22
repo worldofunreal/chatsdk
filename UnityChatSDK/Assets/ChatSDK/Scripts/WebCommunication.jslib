@@ -19,4 +19,12 @@ mergeInto(LibraryManager.library, {
   JSSendMessage: function (message) {
     ReactUnityWebGL.SendMessage(Pointer_stringify(message));
   },
+
+  JSAddUserToGroup: function (json) {
+    ReactUnityWebGL.AddUserToGroup(Pointer_stringify(json));
+  },
+
+  JSCreateGroup: function (groupname) {
+    ReactUnityWebGL.CreateGroup(Pointer_stringify(groupname));
+  },
 });

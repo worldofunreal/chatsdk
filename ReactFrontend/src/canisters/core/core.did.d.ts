@@ -4,6 +4,9 @@ export interface ChatCore {
       [boolean, string]
     >,
   'ban_user' : (arg_0: UserID) => Promise<boolean>,
+  'create_group' : (arg_0: string, arg_1: boolean, arg_2: boolean) => Promise<
+      [boolean, string]
+    >,
   'create_user_profile' : (arg_0: Username__1) => Promise<boolean>,
   'get_user' : (arg_0: UserID) => Promise<[] | [UserData]>,
   'get_user_groups' : () => Promise<[] | [UserGroups]>,

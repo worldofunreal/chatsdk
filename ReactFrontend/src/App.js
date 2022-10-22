@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { StoicIdentity } from "ic-stoic-identity";
 import { Actor, HttpAgent } from "@dfinity/agent";
+import { Principal } from "@dfinity/principal";
 import { idlFactory as coreCanisterIDL } from './canisters/core';
 import { idlFactory as chatCanisterIDL } from './canisters/public_group';
 import Unity, { UnityContext } from "react-unity-webgl";
@@ -62,6 +63,20 @@ function App() {
     }
   }, [chatText]);
 
+  useEffect(() => {
+    const handlePasteAnywhere = event => {
+      let _txt = event.clipboardData.getData('text');
+      console.log(_txt);
+      unityContext.send("ChatManager", "getPaste", _txt);
+    };
+
+    window.addEventListener('paste', handlePasteAnywhere);
+
+    return () => {
+      window.removeEventListener('paste', handlePasteAnywhere);
+    };
+  }, []);
+
   /// Connections to Unity
   unityContext.on("Login", () => {
     loginStoic();
@@ -75,7 +90,19 @@ function App() {
     sendMessage(text);
   });
 
-  // STOIC IDENTITY
+  unityContext.on("AddUserToGroup", (json) => {
+    addUserToGroup(json);
+  });
+
+  unityContext.on("CreateGroup", (groupName) => {
+    createGroup(groupName);
+  });
+
+  unityContext.on("SelectChatGroup", (groupID) => {
+    selectChat(groupID);
+  });
+
+  /// STOIC IDENTITY
   const loginStoic = async () => {
     let _stoicIdentity = await StoicIdentity.load().then(async identity => {
       if (identity !== false) {
@@ -130,20 +157,25 @@ function App() {
   };
 
   const renderGroupsList = () => {
-    /*setGroupsRender(
-      <>
-      {
-        userGroups.map((g) => {
-          return(
-            <div className='one-line'><button onClick={() => { setChatSelected(g); }}>{g.name}</button></div>
-          );
-        })
-      }
-      </>
-    )*/
+    let _userGroups = userGroups;
+    console.log("Groups to process", _userGroups);
+    
+    _userGroups.sort((a, b) => { return (parseInt(a.groupID) - parseInt(b.groupID)) });
+    let _groupsUnity = [];
+    for(let i = 0; i < _userGroups.length; i++){
+      let _group = {
+        id:   parseInt(_userGroups[i].groupID),
+        name: _userGroups[i].name
+      };
+      _groupsUnity.push(_group);
+    }
+    _groupsUnity = "{\"data\":" + JSON.stringify(_groupsUnity) + "}";
+    console.log("Groups to Unity", _groupsUnity);
+    unityContext.send("ChatManager", "GetGroups", _groupsUnity);
   };
 
   const getChatData = async () => {
+    unityContext.send("ChatManager", "ClearMessages", "");
     let _chatCanister = await setCanister(chatCanisterIDL, chatSelected.canister);
     setChatCanister(_chatCanister);
     let _chatData = await _chatCanister.get_messages();
@@ -162,6 +194,19 @@ function App() {
     }
   };
 
+  const selectChat = async (groupID) => {
+    console.log("SELECTING", groupID);
+    for(let i = 0; i < userGroups.length; i++){
+      console.log(userGroups[i]);
+      if(parseInt(userGroups[i].groupID) === groupID){
+        setChatSelected(userGroups[i]);
+        return true;
+      }
+    }
+    console.log("FALSE");
+    return false;
+  };
+
   const renderChatMessages = () => {
     let _chatText = chatText;
     _chatText.sort((a, b) => { return (parseInt(a[0]) - parseInt(b[0])) });
@@ -175,6 +220,26 @@ function App() {
     }
     _msgUnity = "{\"data\":" + JSON.stringify(_msgUnity) + "}";
     unityContext.send("ChatManager", "GetChatMessages", _msgUnity);
+  };
+
+  const createGroup = async (groupName) => {
+    console.log("Group name", groupName);
+    let _group = await chatCoreCanister.create_group(groupName, true, false);
+    console.log("Response create", _group);
+    let _userGroups = await chatCoreCanister.get_user_groups();
+    setUserGroups(_userGroups[0].groups);
+  };
+
+  const addUserToGroup = async (json) => {
+    try{
+      let _data = JSON.parse(json);
+      let _principal = Principal.fromText(_data.userId);
+      let _addUser = await chatCoreCanister.add_user_to_group(_data.groupId, _principal);
+      unityContext.send("ChatManager", "UserAdded", true);
+    } catch(err){
+      console.log("Unable to add user", err);
+      unityContext.send("ChatManager", "UserAdded", false);
+    }
   };
 
   return (
