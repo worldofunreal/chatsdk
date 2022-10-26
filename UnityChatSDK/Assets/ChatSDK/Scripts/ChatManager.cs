@@ -221,10 +221,8 @@ public class ChatManager : MonoBehaviour
     public void GetGroups(string json){
         //groupsList.Clear();
         GroupsList _groupsList = JsonUtility.FromJson<GroupsList>(json);
-        Debug.Log("List of groups");
         int i = 0;
         foreach(GroupData g in _groupsList.data){
-            Debug.Log(g.name);
             AddGroupToList(g.id, g.name, i);
             i++;
         }

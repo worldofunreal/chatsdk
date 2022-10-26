@@ -83,38 +83,38 @@ More information on the process of getting the Stoic Identity here:
 
 ```
 // STOIC IDENTITY
-  const loginStoic = async () => {
-    let _stoicIdentity = await StoicIdentity.load().then(async identity => {
-      if (identity !== false) {
-        //ID is a already connected wallet!
-      } else {
-        //No existing connection, lets make one!
-        identity = await StoicIdentity.connect();
-      }
-      return identity;
-    });
-    setIdentity(_stoicIdentity);
-  };
+const loginStoic = async () => {
+  let _stoicIdentity = await StoicIdentity.load().then(async identity => {
+    if (identity !== false) {
+      //ID is a already connected wallet!
+    } else {
+      //No existing connection, lets make one!
+      identity = await StoicIdentity.connect();
+    }
+    return identity;
+  });
+  setIdentity(_stoicIdentity);
+};
 ```
 
 After we have the identity we can set the canister
 ```
 useEffect(() => {
-    if(identity !== null) {
-      /// When an identity is set, get the Chat canister
-      setCoreCanister();
-    }
+  if(identity !== null) {
+    /// When an identity is set, get the Chat canister
+    setCoreCanister();
+  }
 }, [identity]);
 
 const setCanister = async (idl, canisterId) => {
-    const _canister = Actor.createActor(idl, {
-      agent: new HttpAgent({
-        host: host,
-        identity,
-      }),
-      canisterId,
-    });
-    return _canister;
+  const _canister = Actor.createActor(idl, {
+    agent: new HttpAgent({
+      host: host,
+      identity,
+    }),
+    canisterId,
+  });
+  return _canister;
 };
 
 const setCoreCanister = async () => {
@@ -128,26 +128,26 @@ If the user already exists, we also need to get the groups it belongs to.
 **NOTE: Group on position [0] will always be the public chat on all users**
 ```
 useEffect(() => {
-    if(chatCoreCanister !== null){
-      /// When the canister is set, get the user's data
-      loginUser();
-    }
+  if(chatCoreCanister !== null){
+    /// When the canister is set, get the user's data
+    loginUser();
+  }
 }, [chatCoreCanister]);
 
 const loginUser = async () => {
-    /// Get user if exists
-    let _user = await chatCoreCanister.get_user(identity.getPrincipal());
-    if(_user === null || _user === [] || _user.length <= 0){
-      /// Create new user, send request to ask for user's name from Unity
-      unityContext.send("ChatManager", "SetNewUser", "");
-    } else {
-      /// Already created, set the data and get the user's groups
-      let _userGroups = await chatCoreCanister.get_user_groups();
-      setUserGroups(_userGroups[0].groups);
-      let _publicChat = _userGroups[0].groups[0]
-      setChatSelected(_publicChat);
-      unityContext.send("ChatManager", "Initialize", "");
-    }
+  /// Get user if exists
+  let _user = await chatCoreCanister.get_user(identity.getPrincipal());
+  if(_user === null || _user === [] || _user.length <= 0){
+    /// Create new user, send request to ask for user's name from Unity
+    unityContext.send("ChatManager", "SetNewUser", "");
+  } else {
+    /// Already created, set the data and get the user's groups
+    let _userGroups = await chatCoreCanister.get_user_groups();
+    setUserGroups(_userGroups[0].groups);
+    let _publicChat = _userGroups[0].groups[0]
+    setChatSelected(_publicChat);
+    unityContext.send("ChatManager", "Initialize", "");
+  }
 };
 ```
 
@@ -161,30 +161,30 @@ On Unity3D we get the user’s input for the new username and send it back to Re
 On React we receive the username and create the user on IC with it’s data (identity and username)
 ```
 const createNewUser = async (name) => {
-    if(name.trim() === ""){
-      alert("Select a valid username");
-      return false;
-    }
-    let _newUser = await chatCoreCanister.create_user_profile(name);
-    loginUser();
-  };
+  if(name.trim() === ""){
+    alert("Select a valid username");
+    return false;
+  }
+  let _newUser = await chatCoreCanister.create_user_profile(name);
+  loginUser();
+};
 ```
 
 Once the user is logged in and we have it’s groups we can get the data from any group, on initialization we get it from the public chat
 To get it’s data we need to initialize the canister, set it to the selected canister and call it to get the messages
 ```
 useEffect(() => {
-    if(chatSelected !== null){
-      /// When the user selects a group, get it's data
-      getChatData();
-    }
+  if(chatSelected !== null){
+    /// When the user selects a group, get it's data
+    getChatData();
+  }
 }, [chatSelected]);
 
 const getChatData = async () => {
-    let _chatCanister = await setCanister(chatCanisterIDL, chatSelected.canister);
-    setChatCanister(_chatCanister);
-    let _chatData = await _chatCanister.get_messages();
-    setChatText(_chatData);
+  let _chatCanister = await setCanister(chatCanisterIDL, chatSelected.canister);
+  setChatCanister(_chatCanister);
+  let _chatData = await _chatCanister.get_messages();
+  setChatText(_chatData);
 };
 ```
 
@@ -198,18 +198,18 @@ useEffect(() => {
 }, [chatText]);
 
 const renderChatMessages = () => {
-    let _chatText = chatText;
-    _chatText.sort((a, b) => { return (parseInt(a[0]) - parseInt(b[0])) });
-    let _msgUnity = [];
-    for(let i = 0; i < _chatText.length; i++){
-      let _msg = {
-        id:   parseInt(_chatText[i][0]),
-        text: _chatText[i][1].username + ": " + _chatText[i][1].text
-      };
-      _msgUnity.push(_msg);
-    }
-    _msgUnity = "{\"data\":" + JSON.stringify(_msgUnity) + "}";
-    unityContext.send("ChatManager", "GetChatMessages", _msgUnity);
+  let _chatText = chatText;
+  _chatText.sort((a, b) => { return (parseInt(a[0]) - parseInt(b[0])) });
+  let _msgUnity = [];
+  for(let i = 0; i < _chatText.length; i++){
+    let _msg = {
+      id:   parseInt(_chatText[i][0]),
+      text: _chatText[i][1].username + ": " + _chatText[i][1].text
+    };
+    _msgUnity.push(_msg);
+  }
+  _msgUnity = "{\"data\":" + JSON.stringify(_msgUnity) + "}";
+  unityContext.send("ChatManager", "GetChatMessages", _msgUnity);
 };
 ```
 
@@ -219,18 +219,70 @@ The idea is for every developer to display it on the way they like more, with th
 From React to Unity3D messages are sent in a json with the following structure:
 ```
 {
-    "data":[
-        {
-            "id": 1,
-            "text": "Some text"
-        },
-        {
-            "id": 2,
-            "text": "Other text"
-        }
-    ]
+  "data":[
+    {
+      "id": 1,
+      "text": "Some text"
+    },
+    {
+      "id": 2,
+      "text": "Other text"
+    }
+  ]
 }
 ```
+
+
+Once we have all User's data we can get the user's groups to display them on Unity
+````
+const getUserGroups = async () => {
+  let _userGroups = await chatCoreCanister.get_user_groups();
+  setUserGroups(_userGroups[0].groups);
+  setTimeout(() => {
+    getUserGroups();
+  }, 5000);
+};
+
+const renderGroupsList = () => {
+  /// Once we have all user's groups we can display them
+  let _userGroups = userGroups;
+  /// First we sort them by ID asc
+  _userGroups.sort((a, b) => { return (parseInt(a.groupID) - parseInt(b.groupID)) });
+  let _groupsUnity = [];
+  /// Then we prepare the data for Unity3D
+  /// The data needs to be on an array and each registry needs to have id and name
+  for(let i = 0; i < _userGroups.length; i++){
+    let _group = {
+      id:   parseInt(_userGroups[i].groupID),
+      name: _userGroups[i].name
+    };
+    _groupsUnity.push(_group);
+  }
+  /// After we have the array, it needs to be encapsuled into another json to be processed inside Unity3D
+  _groupsUnity = "{\"data\":" + JSON.stringify(_groupsUnity) + "}";
+  unityContext.send("ChatManager", "GetGroups", _groupsUnity);
+  /// After all data has been send, we set a timeout to continue to query new data
+  setTimeout(() => {
+    updateChatData();
+  }, 3000);
+};
+````
+
+To select a new group we get from Unity the GroupID requested and set it as selected on React
+````
+const selectChat = async (groupID) => {
+  for(let i = 0; i < userGroups.length; i++){
+    console.log(userGroups[i]);
+    if(parseInt(userGroups[i].groupID) === groupID){
+      setChatSelected(userGroups[i]);
+      return true;
+    }
+  }
+  return false;
+};
+````
+
+
 
 On Unity we receive the messages, parse them into the Messages class and add them to the full list
 

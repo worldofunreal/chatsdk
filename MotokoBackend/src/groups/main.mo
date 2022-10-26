@@ -56,15 +56,11 @@ actor class ChatGroups (_owner : Principal) {
     };
 
     public shared(msg) func join_chat(user : UserID, userD : UserData) : async Bool{
-        /// TODO check if user can add other users besides the owner
-        //assert(msg.caller == _owner);
-        /// TODO check if user can be added
         users.put(user, userD);
         return true;
     };
 
     public shared(msg) func add_text_message(_text : Text) : async Bool{
-        /// TODO Check user is added (or chat is public) and not banned
         let _time        : Nat32 = 0;
         let _username    : Username = await getUsername(msg.caller);
         let _new_message : MessageData = {
@@ -79,8 +75,6 @@ actor class ChatGroups (_owner : Principal) {
     };
 
     public shared query(msg) func get_messages() : async [(MessageID, MessageData)]{
-        /// TODO Check user is added (or chat is public) and not banned
-        /// TODO Pagination
         return Iter.toArray(messages.entries());
     };
 

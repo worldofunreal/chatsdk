@@ -156,9 +156,7 @@ extern void Enumerable_Max_mF33848068459BE74BF534D16F6B678BB677EE704 (void);
 // 0x00000089 T System.Collections.Generic.HashSet`1/Enumerator::get_Current()
 // 0x0000008A System.Object System.Collections.Generic.HashSet`1/Enumerator::System.Collections.IEnumerator.get_Current()
 // 0x0000008B System.Void System.Collections.Generic.HashSet`1/Enumerator::System.Collections.IEnumerator.Reset()
-// 0x0000008C System.Void System.Collections.Generic.ICollectionDebugView`1::.ctor(System.Collections.Generic.ICollection`1<T>)
-// 0x0000008D T[] System.Collections.Generic.ICollectionDebugView`1::get_Items()
-static Il2CppMethodPointer s_methodPointers[141] = 
+static Il2CppMethodPointer s_methodPointers[139] = 
 {
 	Error_ArgumentNull_m1141D2C9AF8AB6ACC45E7488789598C5283D4EEE,
 	Error_MoreThanOneMatch_mE8ABBCC1C5FBA4D7BBE5B0647992D20F005F7A97,
@@ -299,14 +297,12 @@ static Il2CppMethodPointer s_methodPointers[141] =
 	NULL,
 	NULL,
 	NULL,
-	NULL,
-	NULL,
 };
-static const int32_t s_InvokerIndices[141] = 
+static const int32_t s_InvokerIndices[139] = 
 {
-	4931,
-	5151,
-	5151,
+	4836,
+	5045,
+	5045,
 	0,
 	0,
 	0,
@@ -331,10 +327,8 @@ static const int32_t s_InvokerIndices[141] =
 	0,
 	0,
 	0,
-	4875,
-	4875,
-	0,
-	0,
+	4780,
+	4780,
 	0,
 	0,
 	0,
@@ -446,7 +440,7 @@ static const int32_t s_InvokerIndices[141] =
 	0,
 	0,
 };
-static const Il2CppTokenRangePair s_rgctxIndices[50] = 
+static const Il2CppTokenRangePair s_rgctxIndices[49] = 
 {
 	{ 0x02000004, { 129, 5 } },
 	{ 0x02000005, { 134, 13 } },
@@ -466,7 +460,6 @@ static const Il2CppTokenRangePair s_rgctxIndices[50] =
 	{ 0x02000014, { 270, 8 } },
 	{ 0x02000015, { 278, 41 } },
 	{ 0x02000017, { 319, 2 } },
-	{ 0x02000018, { 321, 4 } },
 	{ 0x06000004, { 0, 10 } },
 	{ 0x06000005, { 10, 10 } },
 	{ 0x06000006, { 20, 5 } },
@@ -820,11 +813,7 @@ extern const uint32_t g_rgctx_T_t1A61667A2FF6D68BB3DAC186281F928B7ED2DB94;
 extern const uint32_t g_rgctx_IEqualityComparer_1_GetHashCode_mB43AB2E622EB30D675693CDC96CA5D836DE43336;
 extern const uint32_t g_rgctx_Enumerator_get_Current_m6F22509C5AEA1EA15942F7F9C9866256CB3EA347;
 extern const uint32_t g_rgctx_T_t6D22409F37413B725563BF484486F55FB7202BB8;
-extern const uint32_t g_rgctx_ICollection_1_tFEFB414626FD111D128FEBCF2B2893D2D1BFA23B;
-extern const uint32_t g_rgctx_ICollection_1_get_Count_m59A49BC41F6F347F1A5161D5C655CC8F14B4465C;
-extern const uint32_t g_rgctx_TU5BU5D_t7141ABD7B24C6F56B55DB7911E6CE85CAACA4FFF;
-extern const uint32_t g_rgctx_ICollection_1_CopyTo_m142EAE547CEB167F8913259B3A9EBEF7718F80AD;
-static const Il2CppRGCTXDefinition s_rgctxValues[325] = 
+static const Il2CppRGCTXDefinition s_rgctxValues[321] = 
 {
 	{ (Il2CppRGCTXDataType)2, (const void *)&g_rgctx_Iterator_1_tAFB7558C92D3848C170203685AA45B10B6035464 },
 	{ (Il2CppRGCTXDataType)3, (const void *)&g_rgctx_Iterator_1_Where_mB33345A6D2213AB59B7B357292542E752C9AEEF2 },
@@ -1147,25 +1136,21 @@ static const Il2CppRGCTXDefinition s_rgctxValues[325] =
 	{ (Il2CppRGCTXDataType)3, (const void *)&g_rgctx_IEqualityComparer_1_GetHashCode_mB43AB2E622EB30D675693CDC96CA5D836DE43336 },
 	{ (Il2CppRGCTXDataType)3, (const void *)&g_rgctx_Enumerator_get_Current_m6F22509C5AEA1EA15942F7F9C9866256CB3EA347 },
 	{ (Il2CppRGCTXDataType)2, (const void *)&g_rgctx_T_t6D22409F37413B725563BF484486F55FB7202BB8 },
-	{ (Il2CppRGCTXDataType)2, (const void *)&g_rgctx_ICollection_1_tFEFB414626FD111D128FEBCF2B2893D2D1BFA23B },
-	{ (Il2CppRGCTXDataType)3, (const void *)&g_rgctx_ICollection_1_get_Count_m59A49BC41F6F347F1A5161D5C655CC8F14B4465C },
-	{ (Il2CppRGCTXDataType)2, (const void *)&g_rgctx_TU5BU5D_t7141ABD7B24C6F56B55DB7911E6CE85CAACA4FFF },
-	{ (Il2CppRGCTXDataType)3, (const void *)&g_rgctx_ICollection_1_CopyTo_m142EAE547CEB167F8913259B3A9EBEF7718F80AD },
 };
 IL2CPP_EXTERN_C const Il2CppCodeGenModule g_System_Core_CodeGenModule;
 const Il2CppCodeGenModule g_System_Core_CodeGenModule = 
 {
 	"System.Core.dll",
-	141,
+	139,
 	s_methodPointers,
 	0,
 	NULL,
 	s_InvokerIndices,
 	0,
 	NULL,
-	50,
+	49,
 	s_rgctxIndices,
-	325,
+	321,
 	s_rgctxValues,
 	NULL,
 	NULL, // module initializer,

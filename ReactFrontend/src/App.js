@@ -64,6 +64,7 @@ function App() {
   }, [chatText]);
 
   useEffect(() => {
+    /// Unity has problems to paste into inputs on webgl, so we handle it on react
     const handlePasteAnywhere = event => {
       let _txt = event.clipboardData.getData('text');
       console.log(_txt);
@@ -117,6 +118,7 @@ function App() {
   };
 
   const setCanister = async (idl, canisterId) => {
+    /// Code to set a canister requiring idl and the canister id as text
     const _canister = Actor.createActor(idl, {
       agent: new HttpAgent({
         host: host,
@@ -128,6 +130,7 @@ function App() {
   };
 
   const setCoreCanister = async () => {
+    ///Get the main canister
     setChatCoreCanister(await setCanister(coreCanisterIDL, coreCanisterId));
   };
 
@@ -144,6 +147,9 @@ function App() {
       let _publicChat = _userGroups[0].groups[0]
       setChatSelected(_publicChat);
       unityContext.send("ChatManager", "Initialize", "");
+      setTimeout(() => {
+        getUserGroups();
+      }, 2000);
     }
   };
 
@@ -152,16 +158,20 @@ function App() {
       alert("Select a valid username");
       return false;
     }
+    /// Create user with signed accound and selected username
     let _newUser = await chatCoreCanister.create_user_profile(name);
+    /// After creating the user we can login as normal
     loginUser();
   };
 
   const renderGroupsList = () => {
+    /// Once we have all user's groups we can display them
     let _userGroups = userGroups;
-    console.log("Groups to process", _userGroups);
-    
+    /// First we sort them by ID asc
     _userGroups.sort((a, b) => { return (parseInt(a.groupID) - parseInt(b.groupID)) });
     let _groupsUnity = [];
+    /// Then we prepare the data for Unity3D
+    /// The data needs to be on an array and each registry needs to have id and name
     for(let i = 0; i < _userGroups.length; i++){
       let _group = {
         id:   parseInt(_userGroups[i].groupID),
@@ -169,9 +179,13 @@ function App() {
       };
       _groupsUnity.push(_group);
     }
+    /// After we have the array, it needs to be encapsuled into another json to be processed inside Unity3D
     _groupsUnity = "{\"data\":" + JSON.stringify(_groupsUnity) + "}";
-    console.log("Groups to Unity", _groupsUnity);
     unityContext.send("ChatManager", "GetGroups", _groupsUnity);
+    /// After all data has been send, we set a timeout to continue to query new data
+    setTimeout(() => {
+      updateChatData();
+    }, 3000);
   };
 
   const getChatData = async () => {
@@ -190,12 +204,11 @@ function App() {
   const sendMessage = async (message) => {
     if(message.trim() !== ""){
       let _send = await chatCanister.add_text_message(message);
-      updateChatData();
+      //updateChatData();
     }
   };
 
   const selectChat = async (groupID) => {
-    console.log("SELECTING", groupID);
     for(let i = 0; i < userGroups.length; i++){
       console.log(userGroups[i]);
       if(parseInt(userGroups[i].groupID) === groupID){
@@ -203,7 +216,6 @@ function App() {
         return true;
       }
     }
-    console.log("FALSE");
     return false;
   };
 
@@ -222,12 +234,16 @@ function App() {
     unityContext.send("ChatManager", "GetChatMessages", _msgUnity);
   };
 
-  const createGroup = async (groupName) => {
-    console.log("Group name", groupName);
-    let _group = await chatCoreCanister.create_group(groupName, true, false);
-    console.log("Response create", _group);
+  const getUserGroups = async () => {
     let _userGroups = await chatCoreCanister.get_user_groups();
     setUserGroups(_userGroups[0].groups);
+    setTimeout(() => {
+      getUserGroups();
+    }, 5000);
+  };
+
+  const createGroup = async (groupName) => {
+    let _group = await chatCoreCanister.create_group(groupName, true, false);
   };
 
   const addUserToGroup = async (json) => {
@@ -238,6 +254,7 @@ function App() {
       unityContext.send("ChatManager", "UserAdded", true);
     } catch(err){
       console.log("Unable to add user", err);
+      alert("Invalid data, please check the data provided");
       unityContext.send("ChatManager", "UserAdded", false);
     }
   };

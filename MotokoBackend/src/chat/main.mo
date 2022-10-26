@@ -71,10 +71,6 @@ actor class ChatCore (_owner : Principal) {
                 return (false, "Group does not exist");
             };
             case(?_gd){
-                // assert(_gd.owner == msg.caller); 
-                /// (OR msg.caller inside authorized users to add other users OR chat is public) AND user is not banned
-                
-                /// TODO Add user to the canister's group
                 let groupCanister : GroupCanister.ChatGroups = actor(_gd.canister); /// Group canister
                 let _userData : ?UserData = users.get(user);
                 switch(_userData){
@@ -154,8 +150,6 @@ actor class ChatCore (_owner : Principal) {
     };
 
     public shared(msg) func create_group(_groupname: Text, _isPrivate: Bool, _isDirect : Bool) : async (Bool, Text){
-        /// assert user is not banned
-        /// assert user has paid for the group
         //Cycles.add(1_000_000_000_000);
         Cycles.add(300_000_000_000);
         let b = await GroupCanister.ChatGroups(msg.caller);
@@ -195,6 +189,6 @@ actor class ChatCore (_owner : Principal) {
     };
 
     /*public shared(msg) func set_username(username : Username) : async (Bool, Text){
-        assert(msg.caller)
+        //
     };*/
 };
