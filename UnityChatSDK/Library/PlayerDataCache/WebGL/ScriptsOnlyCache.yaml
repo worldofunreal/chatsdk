@@ -1057,7 +1057,7 @@ ScriptsOnlyBuild:
     className: SpriteLibrarySourceAsset
   - hash:
       serializedVersion: 2
-      Hash: 6d2f5d0eac0725a15562f8c7509a1809
+      Hash: 13c07bf0825c4107024a1e5759bf840b
     assemblyName: Assembly-CSharp.dll
     namespaceName: 
     className: ChatManager

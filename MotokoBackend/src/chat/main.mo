@@ -71,6 +71,10 @@ actor class ChatCore (_owner : Principal) {
                 return (false, "Group does not exist");
             };
             case(?_gd){
+                // assert(_gd.owner == msg.caller); 
+                /// (OR msg.caller inside authorized users to add other users OR chat is public) AND user is not banned
+                
+                /// TODO Add user to the canister's group
                 let groupCanister : GroupCanister.ChatGroups = actor(_gd.canister); /// Group canister
                 let _userData : ?UserData = users.get(user);
                 switch(_userData){
@@ -104,7 +108,7 @@ actor class ChatCore (_owner : Principal) {
         return(false, "Request not processed");
     };
 
-    public shared(msg) func create_user_profile(username : Username) : async Bool{
+    public shared(msg) func create_user_profile(username : Username) : async (Bool, Text){
         let _ud : UserData = {
             userID   = msg.caller;
             username = username;
@@ -112,7 +116,7 @@ actor class ChatCore (_owner : Principal) {
         };
         users.put(msg.caller, _ud);
         let _public_group_add : (Bool, Text) = await add_user_to_group(0, msg.caller);
-        return true;
+        return _public_group_add;
     };
 
     public shared(msg) func ban_user(user : UserID) : async Bool{
@@ -150,6 +154,8 @@ actor class ChatCore (_owner : Principal) {
     };
 
     public shared(msg) func create_group(_groupname: Text, _isPrivate: Bool, _isDirect : Bool) : async (Bool, Text){
+        /// assert user is not banned
+        /// assert user has paid for the group
         //Cycles.add(1_000_000_000_000);
         Cycles.add(300_000_000_000);
         let b = await GroupCanister.ChatGroups(msg.caller);
@@ -189,6 +195,41 @@ actor class ChatCore (_owner : Principal) {
     };
 
     /*public shared(msg) func set_username(username : Username) : async (Bool, Text){
-        //
+        assert(msg.caller)
     };*/
 };
+
+
+
+
+/*
+
+Normal users:
+* Can chat in public group
+* Can be added to private groups
+* Can chat in private groups added
+
+Premium users:
+* All from normal users
+* Can create groups as long as its within their quota plan
+
+Premium plans:
+*  5 Private group chats +   5 Private friend chats + in-game direct chat
+* 10 Private group chats +  25 Private friend chats + in-game direct chat
+* 50 Private chats chats + 100 Private friend chats + in-game direct chat
+
+Costs and prices: 
+
+Cost = (
+ (# of available private chats * costs of a month worth of tokens for cycles ) 
+ + 
+ (cost of creating a canister in cycles * # of available chats) 
+)
+
+Price = Cost * 1.03
+
+
+
+Additional individual chats = (costs of a month worth of tokens for cycles + cost of creating a canister in cycles) * 1.04
+
+*/

@@ -44,6 +44,11 @@ public class ChatManager : MonoBehaviour
     [SerializeField] private Button returnToPopup2;
     private bool openAddPopup = false;
 
+    [Header("Close panel : ")]
+    public GameObject closedPanel, closeButtonEncapsule, fullPanel;
+    [SerializeField] private Button closePanel, openPanel;
+    private bool openFullPanel = true;
+
     [Header("Input Settings : ")]
     [SerializeField] private Button loginButton;
     [SerializeField] private Button newUserButton;
@@ -79,6 +84,7 @@ public class ChatManager : MonoBehaviour
         loadingPanel.SetActive(false);
         chatCanvas.SetActive(false);
         popupPanel.SetActive(false);
+        fullPanel.SetActive(true);
         loginButton.onClick.AddListener (() => { LoginRequest(); });
         newUserButton.onClick.AddListener (() => { CreateUser(); });
         addButton.onClick.AddListener(() => { ToggleAddPopup(); });
@@ -90,6 +96,11 @@ public class ChatManager : MonoBehaviour
         closePopupButton.onClick.AddListener(() => { ToggleAddPopup(); });
         returnToPopup1.onClick.AddListener(() => { returnToPopup(); });
         returnToPopup2.onClick.AddListener(() => { returnToPopup(); });
+        /// Open <-> Close
+        closeButtonEncapsule.SetActive(true);
+        closedPanel.SetActive(false);
+        closePanel.onClick.AddListener(() => { ToggleFullPanel(); });
+        openPanel.onClick.AddListener(() => { ToggleFullPanel(); });
     }
 
     void Update()
@@ -143,6 +154,18 @@ public class ChatManager : MonoBehaviour
                     }
                 }
             }
+        }
+    }
+
+    private void ToggleFullPanel(){
+        if(openFullPanel == true){
+            openFullPanel = false;
+            fullPanel.SetActive(false);
+            closedPanel.SetActive(true);
+        } else {
+            openFullPanel = true;
+            fullPanel.SetActive(true);
+            closedPanel.SetActive(false);
         }
     }
 

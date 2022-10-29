@@ -59,8 +59,8 @@ function App() {
   useEffect(() => {
     if(chatText !== null){
       /// Send the messages to Unity
-      renderChatMessages();
     }
+    renderChatMessages();
   }, [chatText]);
 
   useEffect(() => {
@@ -193,7 +193,9 @@ function App() {
     let _chatCanister = await setCanister(chatCanisterIDL, chatSelected.canister);
     setChatCanister(_chatCanister);
     let _chatData = await _chatCanister.get_messages();
-    setChatText(_chatData);
+    if(_chatData !== null){
+      setChatText(_chatData);
+    }
   };
 
   const updateChatData = async () => {
@@ -221,14 +223,16 @@ function App() {
 
   const renderChatMessages = () => {
     let _chatText = chatText;
-    _chatText.sort((a, b) => { return (parseInt(a[0]) - parseInt(b[0])) });
     let _msgUnity = [];
-    for(let i = 0; i < _chatText.length; i++){
-      let _msg = {
-        id:   parseInt(_chatText[i][0]),
-        text: _chatText[i][1].username + ": " + _chatText[i][1].text
-      };
-      _msgUnity.push(_msg);
+    if(_chatText !== null){
+      _chatText.sort((a, b) => { return (parseInt(a[0]) - parseInt(b[0])) });
+      for(let i = 0; i < _chatText.length; i++){
+        let _msg = {
+          id:   parseInt(_chatText[i][0]),
+          text: _chatText[i][1].username + ": " + _chatText[i][1].text
+        };
+        _msgUnity.push(_msg);
+      }
     }
     _msgUnity = "{\"data\":" + JSON.stringify(_msgUnity) + "}";
     unityContext.send("ChatManager", "GetChatMessages", _msgUnity);
@@ -254,7 +258,6 @@ function App() {
       unityContext.send("ChatManager", "UserAdded", true);
     } catch(err){
       console.log("Unable to add user", err);
-      alert("Invalid data, please check the data provided");
       unityContext.send("ChatManager", "UserAdded", false);
     }
   };
